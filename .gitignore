@@ -71,4 +71,4 @@ fabric.properties
 
 .idea
 
-.venv
+venv/

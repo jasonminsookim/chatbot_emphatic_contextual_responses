@@ -72,3 +72,9 @@ fabric.properties
 .idea
 
 venv/
+
+# ignore the config setup
+notebooks/0.0-jmk-config_setup.ipynb
+
+# ignore the config file itself
+praw_config.ini

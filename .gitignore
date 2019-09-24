@@ -73,8 +73,11 @@ fabric.properties
 
 venv/
 
-# ignore the config setup
+# ignore config setup
 notebooks/0.0-jmk-config_setup.ipynb
 
-# ignore the config file itself
+# ignore conif file
 praw_config.ini
+
+# ignore data file
+/data

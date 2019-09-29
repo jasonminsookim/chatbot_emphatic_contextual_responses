@@ -81,3 +81,6 @@ praw_config.ini
 
 # ignore data file
 /data
+
+# ignore the jupyter checkpoints
+/notebooks/.ipynb_checkpoints

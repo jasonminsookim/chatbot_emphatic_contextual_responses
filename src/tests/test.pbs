@@ -16,7 +16,7 @@
 #PBS -A f002bw
 
 # Specify how much time you think the job will run
-#PBS -l walltime=00:00:03
+#PBS -l walltime=00:01:00
 
 # mail is sent to you when the job starts and when it terminates or aborts
 #PBS -M jason.m.kim.gr@dartmouth.edu
@@ -37,5 +37,5 @@ unset CUDA_VISIBLE_DEVICES
 # if using PyCUDA set the CUDA_DEVICE environment variable
 export CUDA_DEVICE=$gpuNum
 # Pass the GPU number as an argument to your program
-python3 torchtest.py > output.txt
+python3 torchtest.py > testoutput.txt
 exit 0

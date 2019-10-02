@@ -28,7 +28,7 @@ api = PushshiftAPI()
 
 
 config = configparser.ConfigParser()
-config.read('../../praw_config.ini')
+config.read('praw_config.ini')
 
 r_praw = praw.Reddit(client_id=config['praw_credentials']['client_id'],
                      client_secret=config['praw_credentials']['secret'],
@@ -87,11 +87,6 @@ for subreddit in subreddits:
             scraped_dict['comment_score'].append(comment.score)
             scraped_dict['comment_edited'].append(comment.edited)
 
-    scraped_df = pd.DataFrame(scraped_dict)
-    scraped_df.to_csv('../data/scraped_data/reddit_submission_comments_iter.csv')
-
-# In[6]:
-
 
 scraped_df = pd.DataFrame(scraped_dict)
 
@@ -113,7 +108,7 @@ print(scraped_df['subreddit'].value_counts())
 # In[9]:
 
 
-scraped_df.to_csv('../../data/raw/scraped_reddit_submissions_comments.csv')
+scraped_df.to_csv('data/raw/scraped_reddit_submissions_comments.csv')
 
 # In[10]:
 

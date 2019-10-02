@@ -1,5 +1,5 @@
 #!/bin/bash -l
-#PBS -N scraping_reddit_threads
+#PBS -N filter_data
 
 # request the queue (enter the possible names, if omitted, default is the default)
 # this job is going to use the default
@@ -10,7 +10,7 @@
 
 # request 0 hours and 15 minutes of wall time
 # (Default is 1 hour without this directive)
-#PBS -l walltime=04:00:00
+#PBS -l walltime=00:00:30
 
 # mail is sent to you when the job starts and when it terminates or aborts
 #PBS -m bea
@@ -18,7 +18,9 @@
 # Join error and standard output into one file
 #PBS -j oe
 
-# specify your email address
+#PBS -
+
+# specify your email aaddress
 #PBS -M Jason.M.Kim.Gr@dartmouth.edu
 
 source activate hpc_chatbot
@@ -29,6 +31,10 @@ source activate hpc_chatbot
 # places the job in the directory from which the job was submitted.
 cd $PBS_O_WORKDIR
 
-python3 scrape_reddit_threads.py
+# Gooes to project root directory
+cd ..
+
+
+python3 src/data/filter_data.py
 
 exit 0

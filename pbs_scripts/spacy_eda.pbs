@@ -6,9 +6,9 @@
 #PBS -q default
 
 # request 1 node
-#PBS -l nodes=1:ppn=1
+#PBS -l nodes=2:ppn=20
 
-#PBS -l walltime=00:30:00
+#PBS -l walltime=03:00:00
 
 # mail is sent to you when the job starts and when it terminates or aborts
 #PBS -m bea
@@ -18,7 +18,7 @@
 
 #PBS -
 
-# specify your email aaddress
+# specify your email address
 #PBS -M Jason.M.Kim.Gr@dartmouth.edu
 
 source activate hpc_chatbot

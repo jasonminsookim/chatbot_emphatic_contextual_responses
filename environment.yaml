@@ -1,10 +1,12 @@
 name: hpc_chatbot
 channels:
 - pytorch
+- anaconda
 - conda-forge
 - https://repo.anaconda.com/pkgs/main
 - defaults
 dependencies:
+- cython=0.29.13=py37he6710b0_0
 - asn1crypto=0.24.0=py37_1003
 - attrs=19.2.0=py_0
 - chardet=3.0.4=py37_1003
@@ -22,7 +24,6 @@ dependencies:
 - pyrsistent=0.15.4=py37h516909a_0
 - pysocks=1.7.1=py37_0
 - requests=2.22.0=py37_1
-- spacy=2.1.8=py37hc9558a2_0
 - srsly=0.1.0=py37he1b5a44_0
 - thinc=7.0.8=py37hc9558a2_0
 - update_checker=0.16=py_0

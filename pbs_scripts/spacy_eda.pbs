@@ -21,7 +21,8 @@
 # specify your email address
 #PBS -M Jason.M.Kim.Gr@dartmouth.edu
 
-source activate hpc_chatbot
+source activate hpc_gpu_nlp
+
 
 
 # By default, PBS scripts execute in your home directory, not the

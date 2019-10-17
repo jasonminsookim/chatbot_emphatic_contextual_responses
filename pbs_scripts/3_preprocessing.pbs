@@ -1,14 +1,16 @@
 #!/bin/bash -l
-#PBS -N spacy_eda
+#PBS -N preprocessing
 
 # request the queue (enter the possible names, if omitted, default is the default)
 # this job is going to use the default
 #PBS -q default
 
 # request 1 node
-#PBS -l nodes=2:ppn=20
+#PBS -l nodes=2:ppn=1
 
-#PBS -l walltime=03:00:00
+# request 0 hours and 15 minutes of wall time
+# (Default is 1 hour without this directive)
+#PBS -l walltime=00:20:00
 
 # mail is sent to you when the job starts and when it terminates or aborts
 #PBS -m bea
@@ -18,20 +20,21 @@
 
 #PBS -
 
-# specify your email address
+# specify your email aaddress
 #PBS -M Jason.M.Kim.Gr@dartmouth.edu
 
 source activate hpc_gpu_nlp
-
 
 
 # By default, PBS scripts execute in your home directory, not the
 # directory from which they were submitted. The following line
 # places the job in the directory from which the job was submitted.
 cd $PBS_O_WORKDIR
+
+# Gooes to project root directory
 cd ..
 
 
-python3 src/data/spacy_eda.py > pbs_scripts/spacy_eda.txt
+python3 src/features/preprocessing.py
 
 exit 0

@@ -381,7 +381,7 @@ def evaluate(sentence):
         predicted_id = tf.cast(tf.argmax(predictions, axis=-1), tf.int32)  # look
 
         # return the result if the predicted_id is equal to the end token
-        if tf.equal(predicted_id, tf.cast(END_TOKEN[0], tf.int32)):
+        if tf.equal(predicted_id, END_TOKEN[0]):
             break
 
         # concatenated the predicted_id to the output which is given to the decoder

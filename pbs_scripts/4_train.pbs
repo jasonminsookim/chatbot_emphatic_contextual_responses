@@ -5,18 +5,18 @@
 #PBS -q gpuq
 # Specify the number of gpus
 #PBS -l nodes=4:ppn=1
-#PBS -l gpus=2
+#PBS -l gpus=1
 # Specify the gpu feature
 #PBS -l feature=gpu
 # Specify your resource account (use qr command to determine)
 #PBS -A f002bhw
 # Specify how much time you think the job will run
-#PBS -l walltime=00:25:00
+#PBS -l walltime=02:00:00
 
 # specify your email aaddress
 #PBS -M Jason.M.Kim.Gr@dartmouth.edu
 
-source activate hpc_gpu_nlp
+source activate gpu_nlp
 # Join error and standard output into one file
 #PBS -j oe
 
@@ -33,6 +33,7 @@ gpuNum=`cat $PBS_GPUFILE | sed -e 's/.*-gpu//g'`
 unset CUDA_VISIBLE_DEVICES
 # if using PyCUDA set the CUDA_DEVICE environment variable
 export CUDA_DEVICE=$gpuNum
+
 # Pass the GPU number as an argument to your program
 python3 src/models/train.py
 

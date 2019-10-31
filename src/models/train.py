@@ -2,10 +2,12 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import pickle
 import tensorflow as tf
 import tensorflow_datasets as tfds
+import matplotlib.pyplot as plt
 import re
-# from PositionalEncoding import PositionalEncoding
-# from MultiHeadAttention import MultiHeadAttention
-# from CustomSchedule import CustomSchedule
+import os
+
+# Deal with a CUDA issue
+CUDA_VISIBLE_DEVICES = 1
 
 # Maximum sentence length
 MAX_LENGTH = 40
@@ -40,7 +42,6 @@ def preprocess_sentence(sentence):
     sentence = sentence.strip()
     # adding a start and an end token to the sentence
     return sentence
-
 
 
 def scaled_dot_product_attention(query, key, value, mask):
@@ -98,7 +99,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
             inputs, shape=(batch_size, -1, self.num_heads, self.depth))
         return tf.transpose(inputs, perm=[0, 2, 1, 3])
 
-    def call(self, inputs):
+    def add(self, inputs):
         query, key, value, mask = inputs['query'], inputs['key'], inputs[
             'value'], inputs['mask']
         batch_size = tf.shape(query)[0]
@@ -133,12 +134,13 @@ def encoder_layer(units, d_model, num_heads, dropout, name="encoder_layer"):
     padding_mask = tf.keras.Input(shape=(1, 1, None), name="padding_mask")
 
     attention = MultiHeadAttention(
-        d_model, num_heads, name="attention")({
+        d_model, num_heads, name="attention").add({
         'query': inputs,
         'key': inputs,
         'value': inputs,
         'mask': padding_mask
     })
+
     attention = tf.keras.layers.Dropout(rate=dropout)(attention)
     attention = tf.keras.layers.LayerNormalization(
         epsilon=1e-6)(inputs + attention)
@@ -241,7 +243,7 @@ def decoder_layer(units, d_model, num_heads, dropout, name="decoder_layer"):
     padding_mask = tf.keras.Input(shape=(1, 1, None), name='padding_mask')
 
     attention1 = MultiHeadAttention(
-        d_model, num_heads, name="attention_1")(inputs={
+        d_model, num_heads, name="attention_1").add(inputs={
         'query': inputs,
         'key': inputs,
         'value': inputs,
@@ -251,12 +253,13 @@ def decoder_layer(units, d_model, num_heads, dropout, name="decoder_layer"):
         epsilon=1e-6)(attention1 + inputs)
 
     attention2 = MultiHeadAttention(
-        d_model, num_heads, name="attention_2")(inputs={
+        d_model, num_heads, name="attention_2").add(inputs={
         'query': attention1,
         'key': enc_outputs,
         'value': enc_outputs,
         'mask': padding_mask
     })
+
     attention2 = tf.keras.layers.Dropout(rate=dropout)(attention2)
     attention2 = tf.keras.layers.LayerNormalization(
         epsilon=1e-6)(attention2 + attention1)
@@ -381,6 +384,9 @@ def evaluate(sentence):
         predicted_id = tf.cast(tf.argmax(predictions, axis=-1), tf.int32)  # look
 
         # return the result if the predicted_id is equal to the end token
+        # if tf.math.equal(predicted_id, END_TOKEN) is not None:
+        #
+        #     break
         if tf.equal(predicted_id, END_TOKEN[0]):
             break
 
@@ -392,12 +398,14 @@ def evaluate(sentence):
 
 
 def predict(sentence):
-    prediction = evaluate(sentence)
+    original_sentence = sentence
+    processed_sentence = preprocess_sentence(sentence)
+    prediction = evaluate(processed_sentence)
 
     predicted_sentence = tokenizer.decode(
         [i for i in prediction if i < tokenizer.vocab_size])
 
-    print('Input: {}'.format(sentence))
+    print('Input: {}'.format(original_sentence))
     print('Output: {}'.format(predicted_sentence))
 
     return predicted_sentence
@@ -426,63 +434,63 @@ dataset = dataset.shuffle(BUFFER_SIZE)
 dataset = dataset.batch(BATCH_SIZE)
 dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
 
-# sample_encoder_layer = encoder_layer(
-#     units=512,
-#     d_model=128,
-#     num_heads=4,
-#     dropout=0.3,
-#     name="sample_encoder_layer")
-#
-# tf.keras.utils.plot_model(
-#     sample_encoder_layer, to_file='encoder_layer.png', show_shapes=True)
-#
-# sample_encoder = encoder(
-#     vocab_size=8192,
-#     num_layers=2,
-#     units=512,
-#     d_model=128,
-#     num_heads=4,
-#     dropout=0.3,
-#     name="sample_encoder")
-#
-# tf.keras.utils.plot_model(
-#     sample_encoder, to_file='encoder.png', show_shapes=True)
-#
-# sample_decoder_layer = decoder_layer(
-#     units=512,
-#     d_model=128,
-#     num_heads=4,
-#     dropout=0.3,
-#     name="sample_decoder_layer")
-#
-# tf.keras.utils.plot_model(
-#     sample_decoder_layer, to_file='decoder_layer.png', show_shapes=True)
-#
-# sample_decoder = decoder(
-#     vocab_size=8192,
-#     num_layers=2,
-#     units=512,
-#     d_model=128,
-#     num_heads=4,
-#     dropout=0.3,
-#     name="sample_decoder")
-#
-# tf.keras.utils.plot_model(
-#     sample_decoder, to_file='decoder.png', show_shapes=True)
-#
-# sample_transformer = transformer(
-#     vocab_size=8192,
-#     num_layers=4,
-#     units=512,
-#     d_model=128,
-#     num_heads=4,
-#     dropout=0.3,
-#     name="sample_transformer")
-#
-# tf.keras.utils.plot_model(
-#     sample_transformer, to_file='transformer.png', show_shapes=True)
-#
-# tf.keras.backend.clear_session()
+sample_encoder_layer = encoder_layer(
+    units=512,
+    d_model=128,
+    num_heads=4,
+    dropout=0.3,
+    name="sample_encoder_layer")
+
+tf.keras.utils.plot_model(
+    sample_encoder_layer, to_file='models/encoder_layer.png', show_shapes=True)
+
+sample_encoder = encoder(
+    vocab_size=8192,
+    num_layers=2,
+    units=512,
+    d_model=128,
+    num_heads=4,
+    dropout=0.3,
+    name="sample_encoder")
+
+tf.keras.utils.plot_model(
+    sample_encoder, to_file='models/encoder.png', show_shapes=True)
+
+sample_decoder_layer = decoder_layer(
+    units=512,
+    d_model=128,
+    num_heads=4,
+    dropout=0.3,
+    name="sample_decoder_layer")
+
+tf.keras.utils.plot_model(
+    sample_decoder_layer, to_file='models/decoder_layer.png', show_shapes=True)
+
+sample_decoder = decoder(
+    vocab_size=8192,
+    num_layers=2,
+    units=512,
+    d_model=128,
+    num_heads=4,
+    dropout=0.3,
+    name="sample_decoder")
+
+tf.keras.utils.plot_model(
+    sample_decoder, to_file='models/decoder.png', show_shapes=True)
+
+sample_transformer = transformer(
+    vocab_size=8192,
+    num_layers=4,
+    units=512,
+    d_model=128,
+    num_heads=4,
+    dropout=0.3,
+    name="sample_transformer")
+
+tf.keras.utils.plot_model(
+    sample_transformer, to_file='models/transformer.png', show_shapes=True)
+
+tf.keras.backend.clear_session()
 
 model = transformer(
     vocab_size=VOCAB_SIZE,
@@ -492,7 +500,8 @@ model = transformer(
     num_heads=NUM_HEADS,
     dropout=DROPOUT)
 
-sample_learning_rate = CustomSchedule(d_model=128)
+
+# sample_learning_rate = CustomSchedule(d_model=128)
 
 # plt.plot(sample_learning_rate(tf.range(200000, dtype=tf.float32)))
 # plt.ylabel("Learning Rate")
@@ -503,15 +512,25 @@ learning_rate = CustomSchedule(D_MODEL)
 optimizer = tf.keras.optimizers.Adam(
     learning_rate, beta_1=0.9, beta_2=0.98, epsilon=1e-9)
 
+checkpoint_path = "models/model_1/cp.ckpt"
+checkpoint_dir = os.path.dirname(checkpoint_path)
+
+# Create a callback that saves the model's weights
+cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
+                                                 save_weights_only=True,
+                                                 verbose=1)
+
+
+# train the model
 model.compile(optimizer=optimizer, loss=loss_function, metrics=[accuracy])
 
-model.fit(dataset, epochs=EPOCHS)
+model.fit(dataset, epochs=EPOCHS, callbacks=[cp_callback])
 
 print(model.summary())
+predict('i feel tired all the time.')
+predict('what is the point of living')
+predict('i have little motivation to do anything')
+predict('i get really nervous around people.')
 
-print(predict('I feel really sad.?'))
 
-saver = tf.train.Saver(max_to_keep=1)
-with tf.Session() as sess:
-    # train your model, then:
-    savePath = saver.save(sess, 'models/test_model.ckpt')
+model.save('models/model_1/saved_model.h5')

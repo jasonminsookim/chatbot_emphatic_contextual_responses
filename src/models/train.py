@@ -5,15 +5,17 @@ import tensorflow_datasets as tfds
 import matplotlib.pyplot as plt
 import re
 import os
+import keras
+from keras.utils.vis_utils import model_to_dot
 
-# Deal with a CUDA issue
-CUDA_VISIBLE_DEVICES = 1
+CUDA_VISIBLE_DEVICES = 0
+
 
 # Maximum sentence length
 MAX_LENGTH = 40
 
 # Fit model epochs
-EPOCHS = 1
+EPOCHS = 40
 
 # Hyper-parameters
 NUM_LAYERS = 2
@@ -533,4 +535,4 @@ predict('i have little motivation to do anything')
 predict('i get really nervous around people.')
 
 
-model.save('models/model_1/saved_model.h5')
+# model.save('models/model_1/saved_model.h5')
